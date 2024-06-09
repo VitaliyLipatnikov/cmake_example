@@ -1,0 +1,63 @@
+cmake_minimum_required(VERSION 3.15)
+project(project)
+
+set(CMAKE_CXX_STANDARD 14)
+
+# Include/ - заголовочные файлы только для проекта avcam
+#  /usr/include/glib-2.0/ - заголовочные файлы для библиотеки glib
+#  /usr/lib/x86_64-linux-gnu/glib-2.0/include  - заголовочные файлы для библиотеки glib
+include_directories(Include/
+      
+        )
+
+set(SRC main.cpp
+        
+        )
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+#Никакой оптимизации в release иначе этот код не будет работать
+set(CMAKE_CXX_FLAGS_RELEASE "-O0")
+
+
+#Статический анализоатор в конфигурации debug , если нужно использовать санитайзер - раскомментировать
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+    #Штобы запустить с Sanitazer раскомментировать следующие определения
+    #add_compile_options(-fsanitize=address)
+    #add_link_options(-fsanitize=address)
+
+    #Статический анализатор CPPcheck
+    find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+    if(CMAKE_CXX_CPPCHECK)
+        list(APPEND CMAKE_CXX_CPPCHECK
+                "--enable=warning"
+                )
+    endif()
+endif()
+
+
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin-${CMAKE_BUILD_TYPE}" )
+
+#библиотека логгер и zeromq
+#zeromq тянет за сообой uuid, потому она тоже указана
+link_directories( ../libs/p7_logger )
+
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+add_executable(project ${SRC} )
+
+target_link_libraries(project rt pthread glib-2.0  p7 ${OpenCV_LIBS}  nanomsg anl uuid )
+
+#Скопировать папку конфигов  в сборочную папку
+get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} PATH)
+add_custom_command(
+        TARGET ${PROJECT_NAME} PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E
+        copy_directory ${PARENT_DIR}/Cfg/  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Cfg
+)

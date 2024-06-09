@@ -1,0 +1,44 @@
+cmake_minimum_required(VERSION 3.15)
+project(my_lib)
+
+set(CMAKE_CXX_STANDARD 14)
+
+
+set(SOURCE_FILES 
+        myclass.cpp
+        )
+
+
+include_directories(
+        /usr/include/glib-2.0/
+        /usr/lib/x86_64-linux-gnu/glib-2.0/include
+       
+)
+
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+#Статический анализоатор в конфигурации debug , если нужно использовать санитайзер - раскомментировать
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+    #Статический анализатор CPPcheck
+    find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+    if(CMAKE_CXX_CPPCHECK)
+        list(APPEND CMAKE_CXX_CPPCHECK
+                "--enable=warning"
+                )
+    endif()
+endif()
+s
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -W ")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin-${CMAKE_BUILD_TYPE}")
+
+add_library(my_lib STATIC ${SOURCE_FILES})
+
+target_link_libraries(my_lib nanomsg glib-2.0 )

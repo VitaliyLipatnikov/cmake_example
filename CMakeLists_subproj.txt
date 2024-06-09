@@ -1,0 +1,48 @@
+cmake_minimum_required(VERSION 3.14)
+project(project_with_subpr)
+
+set(CMAKE_CXX_STANDARD 14)
+
+#Версия
+add_compile_definitions( VERSION=\"0.1.0\")
+
+#scales
+add_subdirectory(project1)
+add_subdirectory(project2)
+add_subdirectory(project3)
+add_subdirectory(project4)
+add_subdirectory(project5)
+add_subdirectory(project6)
+add_subdirectory(project7)
+add_subdirectory(project8)
+add_subdirectory(project9)
+add_subdirectory(project10)
+
+
+#Если не указана конфигурация сборки то установить release
+if(NOT CMAKE_BUILD_TYPE)
+        set(CMAKE_BUILD_TYPE Release)
+endif()
+
+
+#Скопируем исполняемые файлы и конфиги в отдельный каталог, эта цель добавлена в сборку по умолчанию
+add_custom_target(
+        ALL
+        DEPENDS  project1 project2..... 
+
+        #project1
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/project1/bin-${CMAKE_BUILD_TYPE}/project1 ${CMAKE_SOURCE_DIR}/bin-${CMAKE_BUILD_TYPE}/project1
+
+
+        #Создать директорию
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/bin-${CMAKE_BUILD_TYPE}/my_dir
+
+        #Скопировать конфигурационные файлы
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Cfg ${CMAKE_SOURCE_DIR}/bin-${CMAKE_BUILD_TYPE}/Cfg
+
+)
+
+
+
+
+
