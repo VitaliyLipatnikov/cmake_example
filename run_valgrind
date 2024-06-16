@@ -1,0 +1,24 @@
+
+#cmake ./ -DCMAKE_BUILD_TYPE=Debug
+cmake ./ -DCMAKE_BUILD_TYPE=Release
+make
+make _ALL
+
+
+запуск valgrind v
+valgrind --leak-check=full --leak-resolution=med --track-origins=yes --vgdb=no program
+
+запуск valgrind c отслеживанием использования памяти, для просмотра результатов используется спициальная утилита
+установить которую нужно
+add-apt-repository ppa:kubuntu-ppa/backports
+apt-get update && apt-get install massif-visualizer
+//запуск, если программа и файл в том же каталоге, в котором открыта консоль то --massif-out-file=./filename  ./program
+valgrind --tool=massif --massif-out-file=filename --max-snapshots=1000   program
+
+
+//Для включения дампов ядра
+#enable coredump
+ulimit -c unlimited
+#set path
+sudo  sysctl kernel.core_pattern=/home/user/CORE_DUMP/dump-%e-%p
+
