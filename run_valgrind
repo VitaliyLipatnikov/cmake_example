@@ -5,7 +5,7 @@ make
 make _ALL
 
 
-запуск valgrind v
+запуск valgrind  для отслеживания учетек
 valgrind --leak-check=full --leak-resolution=med --track-origins=yes --vgdb=no program
 
 запуск valgrind c отслеживанием использования памяти, для просмотра результатов используется спициальная утилита
@@ -15,6 +15,8 @@ apt-get update && apt-get install massif-visualizer
 //запуск, если программа и файл в том же каталоге, в котором открыта консоль то --massif-out-file=./filename  ./program
 valgrind --tool=massif --massif-out-file=filename --max-snapshots=1000   program
 
+запуск valgrind профилировщика 
+valgrind --tool=callgrind ./templateProj --callgrind-out-file=./callgrind.out 100000000
 
 //Для включения дампов ядра
 #enable coredump
