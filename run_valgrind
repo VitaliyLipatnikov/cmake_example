@@ -9,11 +9,11 @@ make _ALL
 valgrind --leak-check=full --leak-resolution=med --track-origins=yes --vgdb=no program
 
 запуск valgrind c отслеживанием использования памяти, для просмотра результатов используется спициальная утилита
-установить которую нужно
+установить которую нужно. Профилирование стека -stacks=yes очень сильно замедляет 
 add-apt-repository ppa:kubuntu-ppa/backports
 apt-get update && apt-get install massif-visualizer
 //запуск, если программа и файл в том же каталоге, в котором открыта консоль то --massif-out-file=./filename  ./program
-valgrind --tool=massif --massif-out-file=filename --max-snapshots=1000   program
+valgrind --tool=massif --massif-out-file=filename --max-snapshots=1000 --stacks=yes.  program
 
 запуск valgrind профилировщика 
 valgrind --tool=callgrind ./templateProj --callgrind-out-file=./callgrind.out 100000000
