@@ -1,0 +1,129 @@
+cmake_minimum_required(VERSION 3.15)
+
+project(cmake_with_grpc)
+
+set(CMAKE_CXX_STANDARD 20 LANGUAGE C CXX)
+
+#set(CMAKE_C_COMPILER gcc)
+#set(CMAKE_CXX_COMPILER g++)
+#set(CMAKE_ASM_COMPILER as)
+
+
+#default build type is Release
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -march=native  -pipe")
+
+#enable debug symbols for debug
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+
+#set path to grpc build and find package
+set(CMAKE_PREFIX_PATH "/home/spk.ru/lipatnikov/.local/")
+find_package(Protobuf  REQUIRED)
+find_package(gRPC  REQUIRED)
+find_package(absl REQUIRED)
+
+#set build path for executable
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin-${CMAKE_BUILD_TYPE}")
+#set build path for libs
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin-${CMAKE_BUILD_TYPE}")
+
+#find grpc-plugin location and print status
+get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
+message(STATUS "PLUGIN: " ${grpc_cpp_plugin_location})
+
+#proto files are compiled with proto-compiler and grpc_cpp_plugin to get files with .grpc.pb.h .grpc.pb.cc   
+#the static library is compiled from files .grpc.pb.h .grpc.pb.cc   
+#the static library is added to projects grpcClient
+set(PROTO_FILES
+    proto/helloworld.proto
+)
+add_library(hw_grpc_proto ${PROTO_FILES})
+target_link_libraries(hw_grpc_proto
+  absl::check
+  absl::log
+  absl::flags
+  absl::flags_parse
+  protobuf::libprotobuf
+  gRPC::grpc
+  gRPC::grpc++
+)
+
+#files .grpc.pb.h .grpc.pb.cc are createt in ${CMAKE_CURRENT_BINARY_DIR}/proto
+target_include_directories(hw_grpc_proto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+
+#use protoc and grpc-plugin to create .grpc.pb.h .grpc.pb.cc
+protobuf_generate(TARGET hw_grpc_proto LANGUAGE cpp)
+protobuf_generate(TARGET hw_grpc_proto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
+
+
+#sources client. due to the absence of some symbols in the library,  need to add file utf8_validity.cc
+set(SOURCE_FILES_CLIENT 
+        "grpcClient.cpp"
+        "utf8_validity.cc"
+        )
+#was in the example
+#source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES_CLIENT})
+
+
+#sources client. due to the absence of some symbols in the library,  need to add file utf8_validity.cc
+set(SOURCE_FILES_SERVER 
+        "grpcServer.cpp"
+         "utf8_validity.cc"
+        )
+
+#was in the example
+#source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES_SERVER})
+
+
+#users  libs path, there is clickhouse
+link_directories( /usr/local/lib)
+
+add_executable (grpcClient  ${SOURCE_FILES_CLIENT})
+target_link_libraries(grpcClient PRIVATE hw_grpc_proto  clickhouse-cpp-lib lz4 cityhash absl::base)
+#header of library hw_grpc_proto, intellisens can't find header clickhouseb  
+target_include_directories(
+    grpcClient PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/proto/"
+    
+     #clickhouse
+     /usr/local/include/clickhouse 
+     /usr/local/include/clickhouse/types/
+     /usr/local/include/clickhouse/ext_inc/
+)  
+#enable compiler warning
+target_compile_options( grpcClient PRIVATE
+    #-Werror                #Все предупреждения станут ошибками    
+    -Wall                   #включает почти все предупреждения
+    -Wextra                 #включает дополнительные предупреждения
+)
+
+
+add_executable (grpcServer  ${SOURCE_FILES_SERVER})
+target_link_libraries(grpcServer PRIVATE hw_grpc_proto gRPC::grpc++_reflection )
+#header of library hw_grpc_proto intellisens can't find 
+target_include_directories(grpcServer PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/proto/")
+
+#enable compiler warning
+target_compile_options( grpcServer PRIVATE
+    #-Werror                #Все предупреждения станут ошибками    
+    -Wall                   #включает почти все предупреждения
+    -Wextra                 #включает дополнительные предупреждения
+)
+
+#[===[
+#генерит файлы protobuf но не генерит файлы grpc, возможно из-старой версии (cmake 3.22.1
+#generate proto files
+file(GLOB ProtoFiles "${CMAKE_CURRENT_SOURCE_DIR}/proto/helloworld.proto")
+message("${ProtoFiles}")
+
+protobuf_generate_cpp( ProtoSources ProtoHeaders ${ProtoFiles}
+  PLUGIN protoc-gen-grpc=${grpc_cpp_plugin_location}
+  GENERATE_EXTENSIONS .pb.h .pb.cc .grpc.pb.h .grpc.pb.cc
+)
+
+#принт путей сгенеренных файлов 
+message("${ProtoSources}")
+message("${ProtoHeaders}")
+]===]
