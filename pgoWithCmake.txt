@@ -52,3 +52,28 @@ if(CMAKE_BUILD_TYPE MATCHES pgobuild)
     SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} ${PGO_COMPILE_FLAGS}" )
 
 endif()
+
+
+
+# Easy way. Build in Release
+# generate profiler info
+#SET(PGO_COMPILE_FLAGS "-fprofile-generate")
+#use profiler info. USE -fprofile-correction if project not compiled with error Corrupted Profile Info (this is due to multithreading)
+#SET(PGO_COMPILE_FLAGS "-fprofile-use -fprofile-correction")
+#SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native  -pipe  ${PGO_COMPILE_FLAGS}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
