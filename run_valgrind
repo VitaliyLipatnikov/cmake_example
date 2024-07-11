@@ -16,7 +16,7 @@ apt-get update && apt-get install massif-visualizer
 #для просмотра результатов работы cachegrind используется утилита Kcachegrind , ну или может (GraphViz)
 sudo apt update
 sudo apt install snapd
-
+sudo snap install kcachegrind
 
 #профилирование памяти 
 -stacks=yes  Профилирование стека очень сильно замедляет 
