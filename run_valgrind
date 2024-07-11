@@ -37,8 +37,9 @@ apt-get update && apt-get install massif-visualizer
 
 
 
-запуск valgrind профилировщика, для просмотра результатов испольузется kcachegrind 
+#запуск valgrind профилировщика, для просмотра результатов испольузется kcachegrind 
 valgrind --tool=callgrind ./templateProj --callgrind-out-file=./callgrind.out 100000000
+#для просмотра результата в консоли используется callgrind_annotate  
 
 //Для включения дампов ядра
 #enable coredump
