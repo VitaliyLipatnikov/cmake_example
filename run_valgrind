@@ -8,17 +8,18 @@ make _ALL
 #запуск valgrind  для отслеживания учетек
 valgrind --leak-check=full --leak-resolution=med --track-origins=yes --vgdb=no program
 
-#запуск valgrind c отслеживанием использования памяти, для просмотра результатов используется спициальная утилита
-#установить которую нужно.
-add-apt-repository ppa:kubuntu-ppa/backports
-apt-get update && apt-get install massif-visualizer
 
-#для просмотра результатов работы cachegrind используется утилита Kcachegrind , ну или может (GraphViz)
+#запуск cachegrind. С сохранением результата в сжатом виде --log-file=cg.out. Включить информацию о предсказании ветвлений --branch-sim=yes 
+valgrind --tool=cachegrind --log-file=cg.out --branch-sim=yes ./templateProj
+#cg.out можно открыть текстовым редактором. Для просмотра cachegrind.out можно использовать утилиту cg_annotate ./cachegrind.out
+#для просмотра результатов работы cachegrind есть еще графическая утилита: Kcachegrind , ну или может (GraphViz)
+#установка kcachegrind    
 sudo apt update
 sudo apt install snapd
 sudo snap install kcachegrind
 
-#профилирование памяти 
+
+#профилирование памяти massif 
 -stacks=yes  Профилирование стека очень сильно замедляет 
 --time-unit=<i|ms|B> [default: i] Единица времени, используемая для профилирования . Существует три возможности: выполнение инструкций (i), что подходит для большинства случаев; 
 реальное (настенное) время (мс, т.е. миллисекунды), что иногда бывает полезно; 
@@ -29,6 +30,11 @@ sudo snap install kcachegrind
 Это полезно для функций, которые являются обертками для malloc или new, которые могут заполнить деревья распределения неинтересной информацией.
 //запуск, если программа и файл в том же каталоге, в котором открыта консоль то --massif-out-file=./filename  ./program
 valgrind --tool=massif --massif-out-file=filename --max-snapshots=1000 --stacks=yes.  program
+#для просмотра результатов используется спициальная утилита установить которую нужно.
+add-apt-repository ppa:kubuntu-ppa/backports
+apt-get update && apt-get install massif-visualizer
+#для просмотра результатов в консоли можно использовать ms_print ./massif.out
+
 
 
 запуск valgrind профилировщика, для просмотра результатов испольузется kcachegrind 
