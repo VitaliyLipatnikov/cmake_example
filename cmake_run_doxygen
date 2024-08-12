@@ -1,0 +1,26 @@
+#Для релизной конфигурации собрать документацию
+if (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
+#Генератор документации doxygen
+FIND_PACKAGE(Doxygen)
+IF(DOXYGEN_FOUND)
+    MESSAGE(STATUS "Doxygen found")    
+
+    #Указать путь к файлу конфигурации
+    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/doxyfile.in)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+     
+   
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    message("Doxygen build started")
+
+     add_custom_target( doc_doxygen ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM )
+
+ ELSE(DOXYGEN_FOUND)
+    MESSAGE(STATUS "WARNING: Doxygen not found - Reference manual will not be created")
+ENDIF(DOXYGEN_FOUND)
+
+ENDIF()
