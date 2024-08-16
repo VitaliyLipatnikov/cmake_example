@@ -1,5 +1,5 @@
 #Просто имя проекта
-PROJECT_NAME           = "My Project"
+PROJECT_NAME           = "Interface for class tables"
 
 
 #Если тег EXTRACT_ALL установлен на YES, Doxygen будет считать, что все сущности в документации задокументированы,
@@ -25,7 +25,7 @@ UML_LOOK               = YES
 
 #Используя тег PROJECT_BRIEF, можно предоставить необязательное однострочное описание проекта, 
 #которое отображается в верхней части каждой страницы и должно дать зрителю быстрое представление о цели проекта. Описание должно быть кратким.
-PROJECT_BRIEF			=  "Project Description"
+PROJECT_BRIEF			=  "Interface for class tables"
 
 #Если тег COLLABORATION_GRAPH установлен на YES, то Doxygen сгенерирует график для каждого документированного класса, 
 #показывающий прямые и косвенные зависимости реализации (переменные наследования, включения и ссылок на классы) класса
@@ -35,7 +35,7 @@ COLLABORATION_GRAPH		= YES
 #Сгенерировать документацию в формате Latex
 GENERATE_LATEX         = NO
 
-#Кодировка входящих файлов (исходников). Предпочтительно испольозовать UTF-8.
+#Кодировка входящих файлов (исходников)
 INPUT_ENCODING		   = CP1251
 
 #деректория с документацией
@@ -47,3 +47,19 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/
 #Путь к файлу README.md, который будет помещен на главную страницу проекта
 INPUT += @CMAKE_CURRENT_SOURCE_DIR@/docs/README.md
 USE_MDFILE_AS_MAINPAGE = README.md
+
+
+GENERATE_TREEVIEW = TRUE
+
+
+#Внешний вид
+
+#Указывает путь к пользовательскому HTML файлу, описывающему заголовок
+HTML_HEADER =  @CMAKE_CURRENT_SOURCE_DIR@/docs/header.html
+
+#Указывает путь к пользовательскому HTML файлу, описывающему футер
+HTML_FOOTER = @CMAKE_CURRENT_SOURCE_DIR@/docs/footer.html
+
+#казывает путь к пользовательской каскадной таблицы стилей. Обратите внимание на то,
+#что она будет использоваться наряду со стандартной таблицей стилей и потому в ней достаточно описывать только то, что вы изменили
+HTML_EXTRA_STYLESHEET = @CMAKE_CURRENT_SOURCE_DIR@/docs/customdoxygen.css
