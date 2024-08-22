@@ -24,6 +24,7 @@ set(CMAKE_PREFIX_PATH "/home/spk.ru/lipatnikov/.local/")
 find_package(Protobuf  REQUIRED)
 find_package(gRPC  REQUIRED)
 find_package(absl REQUIRED)
+find_package(utf8_range REQUIRED)
 
 #set build path for executable
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin-${CMAKE_BUILD_TYPE}")
@@ -47,6 +48,7 @@ target_link_libraries(hw_grpc_proto
   absl::flags
   absl::flags_parse
   protobuf::libprotobuf
+  utf8_range::utf8_validity
   gRPC::grpc
   gRPC::grpc++
 )
