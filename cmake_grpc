@@ -42,15 +42,18 @@ set(PROTO_FILES
     proto/helloworld.proto
 )
 add_library(hw_grpc_proto ${PROTO_FILES})
-target_link_libraries(hw_grpc_proto
-  absl::check
-  absl::log
-  absl::flags
-  absl::flags_parse
-  protobuf::libprotobuf
-  utf8_range::utf8_validity
-  gRPC::grpc
-  gRPC::grpc++
+#порядок библиотек важен
+target_link_libraries(hw_grpc_proto  
+        protobuf::libprotobuf
+        absl::flags
+        absl::flags_parse 
+        absl::base 
+        absl::log
+        absl::utility
+        gRPC::grpc
+        gRPC::grpc++ 
+        gRPC::grpc++_reflection
+        utf8_range::utf8_validity
 )
 
 #files .grpc.pb.h .grpc.pb.cc are createt in ${CMAKE_CURRENT_BINARY_DIR}/proto
@@ -64,7 +67,6 @@ protobuf_generate(TARGET hw_grpc_proto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.p
 #sources client. due to the absence of some symbols in the library,  need to add file utf8_validity.cc
 set(SOURCE_FILES_CLIENT 
         "grpcClient.cpp"
-        "utf8_validity.cc"
         )
 #was in the example
 #source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES_CLIENT})
@@ -73,9 +75,7 @@ set(SOURCE_FILES_CLIENT
 #sources client. due to the absence of some symbols in the library,  need to add file utf8_validity.cc
 set(SOURCE_FILES_SERVER 
         "grpcServer.cpp"
-         "utf8_validity.cc"
         )
-
 #was in the example
 #source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES_SERVER})
 
@@ -84,7 +84,7 @@ set(SOURCE_FILES_SERVER
 link_directories( /usr/local/lib)
 
 add_executable (grpcClient  ${SOURCE_FILES_CLIENT})
-target_link_libraries(grpcClient PRIVATE hw_grpc_proto  clickhouse-cpp-lib lz4 cityhash absl::base)
+target_link_libraries(grpcClient PRIVATE  hw_grpc_proto  clickhouse-cpp-lib lz4 cityhash )
 #header of library hw_grpc_proto, intellisens can't find header clickhouseb  
 target_include_directories(
     grpcClient PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/proto/"
@@ -103,7 +103,7 @@ target_compile_options( grpcClient PRIVATE
 
 
 add_executable (grpcServer  ${SOURCE_FILES_SERVER})
-target_link_libraries(grpcServer PRIVATE hw_grpc_proto gRPC::grpc++_reflection )
+target_link_libraries(grpcServer PRIVATE  hw_grpc_proto  )
 #header of library hw_grpc_proto intellisens can't find 
 target_include_directories(grpcServer PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/proto/")
 
@@ -114,18 +114,3 @@ target_compile_options( grpcServer PRIVATE
     -Wextra                 #включает дополнительные предупреждения
 )
 
-#[===[
-#генерит файлы protobuf но не генерит файлы grpc, возможно из-старой версии (cmake 3.22.1
-#generate proto files
-file(GLOB ProtoFiles "${CMAKE_CURRENT_SOURCE_DIR}/proto/helloworld.proto")
-message("${ProtoFiles}")
-
-protobuf_generate_cpp( ProtoSources ProtoHeaders ${ProtoFiles}
-  PLUGIN protoc-gen-grpc=${grpc_cpp_plugin_location}
-  GENERATE_EXTENSIONS .pb.h .pb.cc .grpc.pb.h .grpc.pb.cc
-)
-
-#принт путей сгенеренных файлов 
-message("${ProtoSources}")
-message("${ProtoHeaders}")
-]===]
