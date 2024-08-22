@@ -42,14 +42,13 @@ set(PROTO_FILES
     proto/helloworld.proto
 )
 add_library(hw_grpc_proto ${PROTO_FILES})
+
 #порядок библиотек важен
 target_link_libraries(hw_grpc_proto  
         protobuf::libprotobuf
         absl::flags
-        absl::flags_parse 
-        absl::base 
+        absl::flags_parse  
         absl::log
-        absl::utility
         gRPC::grpc
         gRPC::grpc++ 
         gRPC::grpc++_reflection
@@ -84,6 +83,8 @@ set(SOURCE_FILES_SERVER
 link_directories( /usr/local/lib)
 
 add_executable (grpcClient  ${SOURCE_FILES_CLIENT})
+
+#!!!!!!!!!!!!!!!!Библиотека clickhouse-cpp-lib и GRPC ДОЛЖНЫ БЫТЬ СОБРАНЫ  С ОДНОЙ ВЕРСИЕЙ БИБЛИОТЕКИ abseil
 target_link_libraries(grpcClient PRIVATE  hw_grpc_proto  clickhouse-cpp-lib lz4 cityhash )
 #header of library hw_grpc_proto, intellisens can't find header clickhouseb  
 target_include_directories(
